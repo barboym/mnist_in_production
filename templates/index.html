@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title></title>
+        <meta name="description" content="my first game">
+        <meta name="viewport" content="width=device-width">
+
+    </head>
+    <body>
+        <!--[if lt IE 7]>
+            <p class="chromeframe">You are using an <strong>outdated</strong>
+              browser. Please <a href="http://browsehappy.com/">upgrade your browser</a>
+              or <a href="http://www.google.com/chromeframe/?redirect=true">activate
+              Google Chrome Frame</a> to improve your experience.</p>
+        <![endif]-->
+        <!-- Add your site or application content here -->
+        <!--<p>Hello world! Tfffffhis is HTML5 Boilerplateaaa asides.</p>
+    	<div id='div1'> some text</div>-->
+	<canvas id="canvas" width="200" height="200" style="border:1px solid lightgrey;">
+              Your browser does not support the HTML5 canvas tag.
+        </canvas>
+  <button id="clear">clear</button>
+  <button id="download">download image</button>
+  <button id="generate">generate_prediction</button>
+  <textarea id="result"></textarea>
+
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script> <!--jquery-->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.11.0/dist/tf.min.js"></script> <!--tensorflowjs -->
+
+	<script type="module">
+"use strict";
+
+$(function(){
+  init()
+  // run()
+})
+
+//canvas and painting arguments
+let pressed = false;
+let canvas;
+let context;
+let last_loc = 0
+let lineWidth=5
+let lineColor = "#ACD3ED"
+
+//load model
+// async function run(){
+//     const MODEL_URL = 'model.json';
+//     const model = await tf.loadLayersModel(MODEL_URL);
+//     console.log(model.summary());
+// }
+
+//load tensoflow model
+// const tf = require("@tensorflow/tfjs");
+// const tfn = require("@tensorflow/tfjs-node");
+// const handler = tfn.io.fileSystem("./model.json");
+// const model = tf.loadLayersModel(handler);
+// import * as tf from "@tensorflow/tfjs"
+
+
+
+//canvas
+function init(){
+    // Get a reference to the canvas
+    canvas = document.getElementById('canvas');
+    context = canvas.getContext('2d');
+
+    //line style
+    context.fillStyle = lineColor
+    context.lineWidth = lineWidth;
+    context.lineCap = "round";
+    context.strokeStyle = lineColor;
+}
+//mouse tracker + painter
+
+function get_event_location(e){
+  return {x:e.clientX - canvas.offsetLeft, y:e.clientY - canvas.offsetTop}
+}
+
+document.onmousedown = function(e) {
+  pressed = true;
+  let loc = get_event_location(e)
+  context.arc(loc.x,loc.y,lineWidth/2,0,3.14*2)
+  context.fill()
+  last_loc = loc
+}
+document.onmouseup = function(e) {
+  pressed = false;
+  last_loc=0
+}
+document.onmousemove = function(e) {
+  if (pressed && last_loc!=0){
+    let loc = get_event_location(e)
+    context.beginPath()
+    context.moveTo(last_loc.x,last_loc.y)
+    context.lineTo(loc.x,loc.y)
+    context.stroke();
+    context.fill()
+    last_loc=loc
+  }
+}
+
+
+function get_image(){
+  let image = new Image();
+  image.id = "pic";
+  image.src = document.getElementById('canvas').toDataURL();
+  return image
+}
+
+
+//button tracker
+document.getElementById('download').onclick = function(){
+  let image = get_image()
+  //to dowload the image
+  var link = document.createElement('a');
+  link.href = image.src;
+  link.download = 'image.jpg';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
+document.getElementById('generate').onclick = function(){
+  // Generate the image data
+  var img= document.getElementById("canvas").toDataURL("image/png");
+  img = img.replace(/^data:image\/(png|jpg);base64,/, "")
+
+  // Sending the image data to Server
+  $.ajax({
+      type: 'POST',
+      url: '/upload',              // /new
+      data: '{ "imageData" : "' + img + '" }',
+      contentType: 'application/json; charset=utf-8',
+      dataType: 'json',
+      success: function (msg) {
+      // On success code
+      }
+  });
+}
+
+//
+//   fetch("/model", {method: "POST", headers: {'Content-Type': 'application/json'}, body: {"data":document.getElementById('canvas')}});
+// };
+
+document.getElementById('clear').onclick = function(){
+  context.fillStyle = '#ffffff'
+  context.fillRect(0,0,canvas.width,canvas.height)
+};
+
+
+
+
+
+	</script>
+    </body>
+</html>
