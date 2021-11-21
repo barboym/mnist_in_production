@@ -1,11 +1,13 @@
 # mnist_in_production
 recreating http://myselph.de/neuralNet.html for learning purposes
 
-prerequisities
+## prerequisities
+
 python 3.8 
 
+## running instructions
 
-to fetch run 
+to clone run 
 ```
 git clone git@github.com:barboym/mnist_in_production.git project_dir
 ```
