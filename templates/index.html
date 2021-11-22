@@ -18,95 +18,69 @@
               or <a href="http://www.google.com/chromeframe/?redirect=true">activate
               Google Chrome Frame</a> to improve your experience.</p>
         <![endif]-->
-        <!-- Add your site or application content here -->
-        <!--<p>Hello world! Tfffffhis is HTML5 Boilerplateaaa asides.</p>
-    	<div id='div1'> some text</div>-->
-	<canvas id="canvas" width="200" height="200" style="border:1px solid lightgrey;">
-              Your browser does not support the HTML5 canvas tag.
-  </canvas>
-  <form style="display: none" action="/" method="POST" id="form">
-    <input type="hidden" id="imageData" name="image" value=""/>
-  </form>
-  <button id="clear">clear</button>
-  <button id="download">download image</button>
-  <button id="generate">generate_prediction</button>
-  <header>{{res}}</header>
+        <div id="canvasDiv">
+            <canvas id="canvas" width="200" height="200" style="border:1px solid lightgrey;">
+                Your browser does not support the HTML5 canvas tag.
+            </canvas>
+            <script>
+                let pressed = false;
+                let last_loc = 0
+                let lineWidth=5
+                let lineColor = "#ACD3ED"
+
+                // Get a reference to the canvas
+                let canvas = document.getElementById('canvas');
+                let context = canvas.getContext('2d');
+
+                //line style
+                context.fillStyle = lineColor
+                context.lineWidth = lineWidth;
+                context.lineCap = "round";
+                context.strokeStyle = lineColor;
+
+                //mouse tracker + painter
+
+                function get_event_location(e){
+                    return {x:e.clientX - canvas.offsetLeft, y:e.clientY - canvas.offsetTop}
+                }
+
+                document.onmousedown = function(e) {
+                    pressed = true;
+                    let loc = get_event_location(e)
+                    context.arc(loc.x,loc.y,lineWidth/2,0,3.14*2)
+                    context.fill()
+                    last_loc = loc
+                }
+                document.onmouseup = function(e) {
+                    pressed = false;
+                    last_loc=0
+                }
+                document.onmousemove = function(e) {
+                    if (pressed && last_loc!=0){
+                        let loc = get_event_location(e)
+                        context.beginPath()
+                        context.moveTo(last_loc.x,last_loc.y)
+                        context.lineTo(loc.x,loc.y)
+                        context.stroke();
+                        context.fill()
+                        last_loc=loc
+                    }
+                 }
+
+            </script>
+        </div>
+
+        <form style="display: none" action="/" method="POST" id="form">
+        <input type="hidden" id="imageData" name="image" value=""/>
+        </form>
+        <button id="clear">clear</button>
+        <button id="download">download image</button>
+        <button id="generate">generate_prediction</button>
+        <header>{{res}}</header>
 
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script> <!--jquery-->
 
 	<script type="module">
-"use strict";
-
-$(function(){
-  init()
-  // run()
-})
-
-//canvas and painting arguments
-let pressed = false;
-let canvas;
-let context;
-let last_loc = 0
-let lineWidth=5
-let lineColor = "#ACD3ED"
-
-//load model
-// async function run(){
-//     const MODEL_URL = 'model.json';
-//     const model = await tf.loadLayersModel(MODEL_URL);
-//     console.log(model.summary());
-// }
-
-//load tensoflow model
-// const tf = require("@tensorflow/tfjs");
-// const tfn = require("@tensorflow/tfjs-node");
-// const handler = tfn.io.fileSystem("./model.json");
-// const model = tf.loadLayersModel(handler);
-// import * as tf from "@tensorflow/tfjs"
-
-
-
-//canvas
-function init(){
-    // Get a reference to the canvas
-    canvas = document.getElementById('canvas');
-    context = canvas.getContext('2d');
-
-    //line style
-    context.fillStyle = lineColor
-    context.lineWidth = lineWidth;
-    context.lineCap = "round";
-    context.strokeStyle = lineColor;
-}
-//mouse tracker + painter
-
-function get_event_location(e){
-  return {x:e.clientX - canvas.offsetLeft, y:e.clientY - canvas.offsetTop}
-}
-
-document.onmousedown = function(e) {
-  pressed = true;
-  let loc = get_event_location(e)
-  context.arc(loc.x,loc.y,lineWidth/2,0,3.14*2)
-  context.fill()
-  last_loc = loc
-}
-document.onmouseup = function(e) {
-  pressed = false;
-  last_loc=0
-}
-document.onmousemove = function(e) {
-  if (pressed && last_loc!=0){
-    let loc = get_event_location(e)
-    context.beginPath()
-    context.moveTo(last_loc.x,last_loc.y)
-    context.lineTo(loc.x,loc.y)
-    context.stroke();
-    context.fill()
-    last_loc=loc
-  }
-}
-
 
 function get_image(){
   let image = new Image();
@@ -134,53 +108,11 @@ document.getElementById('generate').onclick = function(){
   let data = document.getElementById('canvas').toDataURL()
   $("#imageData").val(data);
   $("#form").submit();
-  // const XHR = new XMLHttpRequest();
-  // // Define what happens on successful data submission
-  // XHR.addEventListener( 'load', function(event) {
-  //   console.log( 'Yeah! Data sent and response loaded.' );
-  // } );
-  // // Define what happens in case of error
-  // XHR.addEventListener( 'error', function(event) {
-  //   console.log( 'Oops! Something went wrong.' );
-  // } );
-  // // Set up our request
-  // XHR.open( 'GET', '/result' );
-  // // Add the required HTTP header for form data POST requests
-  // XHR.setRequestHeader( 'Content-Type', 'application/json' );
-  // // Finally, send our data.
-  // XHR.send(data);
 
-  // window.location.href = 'http://www.google.com';
-  // $.ajax({
-  //     type: 'GET',
-  //     url: '/result',              // /new
-  //     data: data,
-  //     contentType: 'application/json; charset=utf-8',
-  //     dataType: 'json',
-  //     success: function (msg) {
-  //       console.log(msg)
-  //     }
-  // });
 
-  // var img= document.getElementById("canvas").toDataURL("image/png");
-  // img = img.replace(/^data:image\/(png|jpg);base64,/, "")
-  //
-  // // Sending the image data to Server
-  // $.ajax({
-  //     type: 'POST',
-  //     url: '/upload',              // /new
-  //     data: '{ "imageData" : "' + img + '" }',
-  //     contentType: 'application/json; charset=utf-8',
-  //     dataType: 'json',
-  //     success: function (msg) {
-  //     // On success code
-  //     }
-  // });
+
 }
 
-//
-//   fetch("/model", {method: "POST", headers: {'Content-Type': 'application/json'}, body: {"data":document.getElementById('canvas')}});
-// };
 
 document.getElementById('clear').onclick = function(){
   context.fillStyle = '#ffffff'

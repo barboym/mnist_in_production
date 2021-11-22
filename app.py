@@ -24,12 +24,14 @@ def preprocess_image(image_txt):
 def home():
     # print("\n",dict(request.form)["image"],"\n")
     # print(image_txt)
-    image_txt = dict(request.form)["image"]
-    # print(image_txt)
-    preprocessed_image = preprocess_image(image_txt)
-    input_image = preprocessed_image[np.newaxis,...,np.newaxis]
-    result = model.predict(input_image).argmax(axis=1)[0]
-    return render_template("index.html",res=result)
+
+    # image_txt = dict(request.form)["image"]
+    # # print(image_txt)
+    # preprocessed_image = preprocess_image(image_txt)
+    # input_image = preprocessed_image[np.newaxis,...,np.newaxis]
+    # result = model.predict(input_image).argmax(axis=1)[0]
+    # return render_template("index.html",res=result)
+    return render_template("index.html", res="")
 
 
 if __name__ == '__main__':
