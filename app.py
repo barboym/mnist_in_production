@@ -23,11 +23,12 @@ def preprocess_image(image_txt):
 
 @app.route("/",methods=["GET","POST"])
 def home():
-    # print("\n",dict(request.form)["image"],"\n")
+    # print("\n",dict(request.form),"\n")
     # print(image_txt)
-
-    image_txt = dict(request.form)["image"]
+    image_txt = dict(request.form).get("image", 0)
     # print(image_txt)
+    if image_txt==0:
+        return render_template("index.html",res="")
     preprocessed_image = preprocess_image(image_txt)
     input_image = preprocessed_image[np.newaxis,...,np.newaxis]
     result = model.predict(input_image).argmax(axis=1)[0]
