@@ -9,7 +9,7 @@
         <title></title>
         <meta name="description" content="my first game">
         <meta name="viewport" content="width=device-width">
-
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script> <!--jquery-->
     </head>
     <body>
         <!--[if lt IE 7]>
@@ -27,23 +27,18 @@
                 let last_loc = 0
                 let lineWidth=5
                 let lineColor = "#ACD3ED"
-
                 // Get a reference to the canvas
                 let canvas = document.getElementById('canvas');
                 let context = canvas.getContext('2d');
-
                 //line style
                 context.fillStyle = lineColor
                 context.lineWidth = lineWidth;
                 context.lineCap = "round";
                 context.strokeStyle = lineColor;
-
                 //mouse tracker + painter
-
                 function get_event_location(e){
                     return {x:e.clientX - canvas.offsetLeft, y:e.clientY - canvas.offsetTop}
                 }
-
                 document.onmousedown = function(e) {
                     pressed = true;
                     let loc = get_event_location(e)
@@ -66,63 +61,62 @@
                         last_loc=loc
                     }
                  }
-
             </script>
         </div>
 
-        <form style="display: none" action="/" method="POST" id="form">
-        <input type="hidden" id="imageData" name="image" value=""/>
-        </form>
-        <button id="clear">clear</button>
-        <button id="download">download image</button>
-        <button id="generate">generate_prediction</button>
-        <header>{{res}}</header>
+        <div id="buttonDiv">
+            <button id="clear">clear</button>
+            <button id="download">download image</button>
+            <button id="generate">generate_prediction</button>
+            <form style="display: none" action="/" method="POST" id="form">
+                <input type="hidden" id="imageData" name="image" value=""/>
+            </form>
+            <script>
+                function get_image(){
+                    let image = new Image();
+                    image.id = "pic";
+                    image.src = document.getElementById('canvas').toDataURL();
+                    return image
+                }
+                //button tracker
+                document.getElementById('download').onclick = function(){
+                    let image = get_image()
+                    //to dowload the image
+                    var link = document.createElement('a');
+                    link.href = image.src;
+                    link.download = 'image.jpg';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                };
+                document.getElementById('generate').onclick = function(){
+                    // Generate the image data
+                    console.log("trying to send stuff to server")
+                    let form = document.createElement('form');
+                    let data = document.getElementById('canvas').toDataURL()
+                    form.setAttribute('method', 'POST');
+                    form.setAttribute('action', '/');
 
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script> <!--jquery-->
+                    let hiddenField = document.createElement('input');
+                    hiddenField.setAttribute('type', 'hidden');
+                    hiddenField.setAttribute('name', 'image');
+                    hiddenField.setAttribute('value', data);
+                    form.appendChild(hiddenField);
+                    document.body.appendChild(form);
+                    form.submit();
+                    document.body.removeChild(link);
 
-	<script type="module">
-
-function get_image(){
-  let image = new Image();
-  image.id = "pic";
-  image.src = document.getElementById('canvas').toDataURL();
-  return image
-}
-
-
-//button tracker
-document.getElementById('download').onclick = function(){
-  let image = get_image()
-  //to dowload the image
-  var link = document.createElement('a');
-  link.href = image.src;
-  link.download = 'image.jpg';
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-};
-
-document.getElementById('generate').onclick = function(){
-  // Generate the image data
-  console.log("trying to send stuff to server")
-  let data = document.getElementById('canvas').toDataURL()
-  $("#imageData").val(data);
-  $("#form").submit();
-
-
-
-}
-
-
-document.getElementById('clear').onclick = function(){
-  context.fillStyle = '#ffffff'
-  context.fillRect(0,0,canvas.width,canvas.height)
-};
-
-
-
-
-
-	</script>
+                    // $("#imageData").val(data); //can be used for hidden form instead
+                    // $("#form").submit();
+                }
+                document.getElementById('clear').onclick = function(){
+                    context.fillStyle = '#ffffff'
+                    context.fillRect(0,0,canvas.width,canvas.height)
+                };
+            </script>
+        </div>
+        <div>
+            <header>{{res}}</header>
+        </div>
     </body>
 </html>
