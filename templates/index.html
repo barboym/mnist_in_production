@@ -9,6 +9,18 @@
         <title></title>
         <meta name="description" content="my first game">
         <meta name="viewport" content="width=device-width">
+        <style>
+            .Row {
+                display: table;
+<!--                width: 100%; /*Optional*/-->
+                table-layout: fixed; /*Optional*/
+                border-spacing: 10px; /*Optional*/
+            }
+            .Column {
+                display: table-cell;
+<!--                background-color: red; /*Optional*/-->
+            }
+        </style>
         <!-- <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script> -->
     </head>
     <body>
@@ -18,53 +30,73 @@
               or <a href="http://www.google.com/chromeframe/?redirect=true">activate
               Google Chrome Frame</a> to improve your experience.</p>
         <![endif]-->
-        <div id="canvasDiv">
-            <canvas id="canvas" width="200" height="200" style="border:1px solid lightgrey;">
-                Your browser does not support the HTML5 canvas tag.
-            </canvas>
-            <script>
-                let pressed = false;
-                let last_loc = 0
-                let lineWidth=5
-                let lineColor = "#ACD3ED"
-                // Get a reference to the canvas
-                let canvas = document.getElementById('canvas');
-                let context = canvas.getContext('2d');
-                //line style
-                context.fillStyle = lineColor
-                context.lineWidth = lineWidth;
-                context.lineCap = "round";
-                context.strokeStyle = lineColor;
-                //mouse tracker + painter
-                function get_event_location(e){
-                    return {x:e.clientX - canvas.offsetLeft, y:e.clientY - canvas.offsetTop}
-                }
-                document.onmousedown = function(e) {
-                    pressed = true;
-                    let loc = get_event_location(e)
-                    context.arc(loc.x,loc.y,lineWidth/2,0,3.14*2)
-                    context.fill()
-                    last_loc = loc
-                }
-                document.onmouseup = function(e) {
-                    pressed = false;
-                    last_loc=0
-                }
-                document.onmousemove = function(e) {
-                    if (pressed && last_loc!=0){
-                        let loc = get_event_location(e)
-                        context.beginPath()
-                        context.moveTo(last_loc.x,last_loc.y)
-                        context.lineTo(loc.x,loc.y)
-                        context.stroke();
-                        context.fill()
-                        last_loc=loc
+        <div id="firstRow" class="Row">
+            <div id="canvasDraw" class="Column">
+                <canvas id="canvas" width="200" height="200" style="border:1px solid lightgrey;">
+                    Your browser does not support the HTML5 canvas tag.
+                </canvas>
+                <script>
+                    let pressed = false;
+                    let last_loc = 0
+                    let lineWidth=10
+                    let lineColor = "#ACD3ED"
+                    // Get a reference to the canvas
+                    let canvas = document.getElementById('canvas');
+                    let context = canvas.getContext('2d');
+                    //line style
+                    context.fillStyle = lineColor
+                    context.lineWidth = lineWidth;
+                    context.lineCap = "round";
+                    context.strokeStyle = lineColor;
+                    //mouse tracker + painter
+                    function get_event_location(e){
+                        return {x:e.clientX - canvas.offsetLeft, y:e.clientY - canvas.offsetTop}
                     }
-                 }
-            </script>
+                    document.onmousedown = function(e) {
+                        pressed = true;
+                        let loc = get_event_location(e)
+                        context.arc(loc.x,loc.y,lineWidth/2,0,3.14*2)
+                        context.fill()
+                        last_loc = loc
+                    }
+                    document.onmouseup = function(e) {
+                        pressed = false;
+                        last_loc=0
+                    }
+                    document.onmousemove = function(e) {
+                        if (pressed && last_loc!=0){
+                            let loc = get_event_location(e)
+                            context.beginPath()
+                            context.moveTo(last_loc.x,last_loc.y)
+                            context.lineTo(loc.x,loc.y)
+                            context.stroke();
+                            context.fill()
+                            last_loc=loc
+                        }
+                     }
+                </script>
+            </div>
+            <div id="canvasInput" class="Column">
+                <canvas id="canvas_input" width="200" height="200" style="border:1px solid lightgrey;">
+                    Your browser does not support the HTML5 canvas tag.
+                </canvas>
+                <script>
+                    let canvas = document.getElementById('canvas_input');
+                    let context = canvas.getContext('2d');
+                    let b64imgData = btoa({{input_image}}); //Binary to ASCII, where it probably stands for
+                    let img = new Image();
+                    console.log(b64imgData)
+                    img.src = "data:image/jpeg;base64," + b64imgData;
+                    context.drawImage(img, 0, 0, canvas.width, canvas.height)
+                </script>
+            </div>
+            <div id="model_output" class="Column">
+                <header style="font-size:40px">{{result}}</header>
+            </div>
         </div>
 
-        <div id="buttonDiv">
+
+        <div id="buttonDiv" class="Row">
             <button id="clear">clear</button>
             <button id="download">download image</button>
             <button id="generate">generate_prediction</button>
@@ -104,7 +136,7 @@
                     form.appendChild(hiddenField);
                     document.body.appendChild(form);
                     form.submit();
-                    document.body.removeChild(link);
+                    document.body.removeChild(form);
 
                     // $("#imageData").val(data); //can be used for hidden form instead
                     // $("#form").submit();
@@ -114,9 +146,6 @@
                     context.fillRect(0,0,canvas.width,canvas.height)
                 };
             </script>
-        </div>
-        <div>
-            <header>{{res}}</header>
         </div>
     </body>
 </html>
