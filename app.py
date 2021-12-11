@@ -1,8 +1,9 @@
+import base64
+
 from flask import Flask
 from flask import render_template
 from flask import request
 
-import base64
 import tensorflow as tf
 import numpy as np
 
@@ -69,14 +70,13 @@ def home():
     image_txt = dict(request.form).get("image", "NO_IMAGE")
     input_image_txt = convert_image_from_tensor_to_txt(
         tf.constant(np.ones(shape=(1, *CANVAS_SHAPE, 1))))  # white image
-    if image_txt == "NO_IMAGE":
-        return render_template("index.html", res="", input_image=input_image_txt)
-
-    input_image = preprocess_image(image_txt)
-    result = model.predict(input_image).argmax(axis=1)[0]
-    # converting to RGBA shape
-    input_image_rgba = convert_from_grey_scale_to_rgba(input_image)
-    input_image_txt = convert_image_from_tensor_to_txt(tf.image.resize(input_image_rgba, CANVAS_SHAPE))
+    result = "" 
+    if image_txt != "NO_IMAGE":
+        input_image = preprocess_image(image_txt)
+        result = model.predict(input_image).argmax(axis=1)[0]
+        # converting to RGBA shape
+        input_image_rgba = convert_from_grey_scale_to_rgba(input_image)
+        input_image_txt = convert_image_from_tensor_to_txt(tf.image.resize(input_image_rgba, CANVAS_SHAPE))
     return render_template("index.html", result=result, input_image=input_image_txt)
 
 
