@@ -76,19 +76,8 @@
                      }
                 </script>
             </div>
-            <div id="canvasInput" class="Column">
-                <canvas id="canvas_input" width="200" height="200" style="border:1px solid lightgrey;">
-                    Your browser does not support the HTML5 canvas tag.
-                </canvas>
-                <script>
-                    let canvas = document.getElementById('canvas_input');
-                    let context = canvas.getContext('2d');
-                    let b64imgData = btoa({{input_image}}); //Binary to ASCII, where it probably stands for
-                    let img = new Image();
-                    console.log(b64imgData)
-                    img.src = "data:image/jpeg;base64," + b64imgData;
-                    context.drawImage(img, 0, 0, canvas.width, canvas.height)
-                </script>
+            <div id="modelInput" class="Column">
+                <img src="data:image/png;base64,{{input_image}}">
             </div>
             <div id="model_output" class="Column">
                 <header style="font-size:40px">{{result}}</header>
